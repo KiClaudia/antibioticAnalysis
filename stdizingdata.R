@@ -3,6 +3,7 @@ data <- read.csv("C:/Users/claud/OneDrive - USU/Desktop/Antibiotic study 2022/an
 View(data)
 
 library(dplyr)
+# in the future, use the scale(), it will automatically do the standardizing
 # drom
 jan20dromavg <- mean(data$jan20drom, na.rm = TRUE)
 jan20dromstd <- sd(data$jan20drom, na.rm = TRUE)
@@ -40,3 +41,13 @@ feb8oxystd <- sd(data$feb8oxy, na.rm = TRUE)
 data_fixed <- data_fixed %>%
   mutate(feb8oxy_std = (feb8oxy-feb8oxyavg)/feb8oxystd)
 View(data_fixed)
+
+# Oxidative stress index = std_drom - std_oxy
+data_fixed <- data_fixed %>%
+  mutate(jan20osi = jan20drom_std-jan20oxy_std) %>%
+  mutate(jan24osi = jan24drom_std-jan24oxy_std) %>%
+  mutate(feb8osi = feb8drom_std-feb8oxy_std)
+View(data_fixed)  
+
+# exporting data_fixed
+write.csv(data_fixed,"C:/Users/claud/OneDrive - USU/Desktop/Antibiotic study 2022/antibioticAnalysis/data/AbxMasterData_withosi.csv", row.names = FALSE)
