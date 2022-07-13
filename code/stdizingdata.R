@@ -50,4 +50,4 @@ data_fixed <- data_fixed %>%
 View(data_fixed)  
 
 # exporting data_fixed
-write.csv(data_fixed,"C:/Users/claud/OneDrive - USU/Desktop/Antibiotic study 2022/antibioticAnalysis/data/AbxMasterData_withosi.csv", row.names = FALSE)
+write.csv(data_fixed,"C:/Users/claud/OneDrive - USU/Desktop/Antibiotic study 2022/antibioticAnalysis/data/AbxMasterData_with_OSI.csv", row.names = FALSE)
