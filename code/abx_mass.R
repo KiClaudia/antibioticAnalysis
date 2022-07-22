@@ -1,0 +1,48 @@
+# 7/21/2022 
+# Question: Effect of antibiotics on phys variables - MASS? 
+# Method: RM - two way ANOVA, compare across treatment (clind, pen, ctrl) from january 20 to january 24
+
+gi <- read.csv("C:/Users/claud/OneDrive - USU/Desktop/Antibiotic study 2022/antibioticAnalysis/data/AbxMasterData_with_OSI.csv")
+View(gi) 
+
+library("rstatix")
+library("tidyverse")
+library("dplyr")
+library("ggpubr")
+library("ggrepel")
+
+str(gi)
+gi$iguanaID <- as.factor(gi$iguanaID)
+gi$tx <- as.factor(gi$tx)
+gi$abx <- as.factor(gi$abx)
+gi$lps <- as.factor(gi$lps)
+str(gi)
+
+# convert to wide
+data <- gi %>%
+  select(jan20mass, jan24mass, iguanaID, abx, tx, lps) %>%
+  gather(key = "time", value = "mass", jan20mass, jan24mass) %>%
+  convert_as_factor(iguanaID, time) %>%
+  na.exclude()
+View(data)
+
+# visualization
+ggboxplot(data, x = "time", y = "mass", color = "abx")
+
+
+# summary stats
+data %>%
+  group_by(time, abx) %>%
+  get_summary_stats(mass, type = "mean_se")
+
+# outliers
+data %>%
+  group_by(time, abx) %>%
+  identify_outliers(mass) #-----no outliers
+
+# normality (use shapiro test because sample size is smaller than 50, n = ~24)
+data %>%
+  group_by(time, abx) %>%
+  shapiro_test(mass) #--------normal
+
+

@@ -12,3 +12,6 @@ In the future, we can use scale(x, center=TRUE, scale=TRUE). center is whether t
 Created new data sheet AbxMasterData_with_OSI.csv
 
 AbxMasterData is data set without OSI, the original
+
+# 7/21/2022
+New script abx_mass in folder code, 2 way rm anova looking at effects of antibiotics on mass (only doing first two time points, not LPS challenge)
