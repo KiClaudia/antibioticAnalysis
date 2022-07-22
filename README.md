@@ -15,3 +15,7 @@ AbxMasterData is data set without OSI, the original
 
 # 7/21/2022
 New script abx_mass in folder code, 2 way rm anova looking at effects of antibiotics on mass (only doing first two time points, not LPS challenge)
+New script abx_totri "" ---> log transformed
+New script abx_osi ""
+New script abx_glucose ""
+New script abx_bka, beta regression --> decimal transformed

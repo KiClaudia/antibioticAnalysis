@@ -1,5 +1,5 @@
 # 7/21/2022 
-# Question: Effect of antibiotics on phys variables - MASS? 
+# Question: Effect of antibiotics on phys variables - OSI? 
 # Method: RM - two way ANOVA, compare across treatment (clind, pen, ctrl) from january 20 to january 24
 
 gi <- read.csv("C:/Users/claud/OneDrive - USU/Desktop/Antibiotic study 2022/antibioticAnalysis/data/AbxMasterData_with_OSI.csv")
@@ -20,35 +20,44 @@ str(gi)
 
 # convert to wide
 data <- gi %>%
-  select(jan20mass, jan24mass, iguanaID, abx, tx, lps) %>%
-  gather(key = "time", value = "mass", jan20mass, jan24mass) %>%
+  select(jan20osi, jan24osi, iguanaID, abx, tx, lps) %>%
+  gather(key = "time", value = "OSI", jan20osi, jan24osi) %>%
   convert_as_factor(iguanaID, time) %>%
   na.exclude()
 View(data)
 
 # visualization
-ggboxplot(data, x = "time", y = "mass", color = "abx")
+ggboxplot(data, x = "time", y = "OSI", color = "abx")
 
 
 # summary stats
 data %>%
   group_by(time, abx) %>%
-  get_summary_stats(mass, type = "mean_se")
+  get_summary_stats(OSI, type = "mean_se")
 
 # outliers
 data %>%
   group_by(time, abx) %>%
-  identify_outliers(mass) #-----no outliers
+  identify_outliers(OSI) #----- is.extreme ID #53
+
+data <- data %>%
+  filter(!iguanaID %in% c("53"))
+View(data)
 
 # normality (use shapiro test because sample size is smaller than 50, n = ~24)
 data %>%
   group_by(time, abx) %>%
-  shapiro_test(mass) #--------normal
+  shapiro_test(OSI) # not normal
+
+ggqqplot(data, "OSI", ggtheme = theme_bw()) +
+  facet_grid(time ~ abx, labeller = "label_both") # normal enough
+
+hist(sqrt(data$OSI)) 
 
 # ANOVA
 sat = anova_test(
   data = data, 
-  mass ~ abx  *time,
+  OSI ~ abx  *time,
   wid = iguanaID
 )
 get_anova_table(sat)
