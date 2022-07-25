@@ -25,3 +25,6 @@ New script abxLPS_mass in folder code. 3 way rm anova looking at effects of anti
 New script for OSI ''
 New script for glucose ''
 New script for totri ''
+
+# 7/25/2022
+New script for lysis. Non-parametric, need kruskal wallis
