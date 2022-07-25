@@ -52,4 +52,13 @@ range(data$decimal) # range is good
 betamodel <- betareg::betareg(data$decimal ~ data$abx * data$time)
 summary(betamodel)
 
-# not significant
+betatime <- betareg::betareg(data$decimal ~  data$time)
+summary(betatime)
+
+betaabx <- betareg::betareg(data$decimal ~  data$abx)
+summary(betaabx)
+
+models <- list(betamodel, betatime, betaabx)
+
+selection <- aictab(cand.set = models)
+selection
