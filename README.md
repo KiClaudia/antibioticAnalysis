@@ -28,3 +28,4 @@ New script for totri ''
 
 # 7/25/2022
 New script for lysis. Non-parametric, need kruskal wallis
+New script for agglutination, non-parametric, need kruskal wallis
