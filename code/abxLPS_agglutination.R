@@ -126,9 +126,9 @@ View(data6)
 ggboxplot(data6, x = "tx", y = "score")
 
 # test
-kruskal.test(score ~ lps, data = data6) 
-kruskal.test(score ~ abx, data = data6) 
-kruskal.test(score ~ tx, data = data6) 
+kruskal.test(score ~ lps, data = data6) #p = 0.0145
+kruskal.test(score ~ abx, data = data6) ns
+kruskal.test(score ~ tx, data = data6) #p = 0.02989
 pairwise.wilcox.test(data6$score, data6$tx)
 
 #------- Compare Abx effect on LPS (do all LPS then do all PBS) still with time diff--------
@@ -178,11 +178,11 @@ pairwise.wilcox.test(abxL$score, abxL$abx) #L is not significant
 
 #------- Compare LPS effect on Abx (do all C, then P, then W) still with time diff-----------
 
-#-------- 24hr-baseline
+#-------- 24hr-prelps
 newdat <- gi %>%
   mutate(score = jan26agg - jan24agg) %>%
   select(score, iguanaID, abx, tx, lps, jan24agg, jan26agg) %>%
-  filter(abx == "P")%>%
+  filter(abx == "W")%>% #change P C W here to see each result
   na.exclude()
 head(newdat)
 
@@ -192,11 +192,11 @@ ggboxplot(newdat, x = "lps", y = "score")
 # test
 kruskal.test(score ~ lps, data = newdat) # ns 
 
-#----------- 1week-baseline
+#----------- 1week-prelps
 newdat2 <- gi %>%
   mutate(score = feb1agg - jan24agg) %>%
   select(score, iguanaID, abx, tx, lps, jan24agg, feb1agg) %>%
-  filter(abx == "W")%>%
+  filter(abx == "C")%>%
   na.exclude()
 head(newdat2)
 
@@ -206,11 +206,11 @@ ggboxplot(newdat2, x = "lps", y = "score")
 # test
 kruskal.test(score ~ lps, data = newdat2) # ns 
 
-#----------- 2week-baseline
+#----------- 2week-prelps
 newdat3 <- gi %>%
   mutate(score = feb8agg - jan24agg) %>%
   select(score, iguanaID, abx, tx, lps, jan24agg, feb8agg) %>%
-  filter(abx == "P")%>%
+  filter(abx == "W")%>%
   na.exclude()
 head(newdat3)
 

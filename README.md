@@ -30,3 +30,8 @@ New script for totri ''
 New script for lysis. Non-parametric, need kruskal wallis
 New script for agglutination, non-parametric, need kruskal wallis
 New script for BKA, used beta regression
+
+# 4/19/2023
+We can't look at effect of just antibiotics because there is no Jan20 time point. 
+New script abxLPS_igy, 3 way rm anova looking at effects of anx AND LPS over entire study
+Updated in manuscript too (results)

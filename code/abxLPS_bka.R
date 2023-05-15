@@ -178,3 +178,12 @@ summary (mod7)
 data5 %>%
   group_by( abx) %>%
   get_summary_stats(BKA, type = "mean_se")
+
+#---------------graphs-------------------------
+ggplot(data, aes(x=factor(time, level=c('jan20bka', 'jan24bka', 'jan26bka', 'feb1bka', 'feb8bka')), y=BKA, color = abx)) + 
+  geom_boxplot() +
+  xlab("time") +
+  scale_x_discrete(breaks=c('jan20bka', 'jan24bka', 'jan26bka', 'feb1bka', 'feb8bka'),
+                   labels=c("AbxTrtStart", "AbxTrtEnd", "24hrPostLPS", "1weekPostLPS", "2weekPostLPS"))
+
+
