@@ -27,8 +27,8 @@ data <- gi %>%
 View(data)
 
 # visualization
-ggboxplot(data, x = "abx", y = "glucose", color = "time", facet.by = "lps")
-
+ggboxplot(data, x = "time", y = "glucose")#, color = "abx")#, facet.by = "lps")
+data$time <- factor(data$time, levels = c('jan20glu','jan24glu', 'feb8glu'))
 
 # summary stats
 data %>%

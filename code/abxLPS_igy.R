@@ -72,7 +72,11 @@ data %>%
   group_by(time) %>%
   get_summary_stats(igy, type = "mean_se")
 ggboxplot(data, x = "time", y = "igy")
+#######################
+data$time <- factor(data$time, levels = c('jan24igy', 'jan26igy','feb1igy','feb8igy'))
+ggboxplot(data, x = "time", y = "igy")
 
+#######################
 data %>%
   group_by(lps) %>%
   get_summary_stats(igy, type = "mean_se")

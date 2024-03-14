@@ -33,8 +33,17 @@ ggboxplot(data, x = "abx", y = "agglutination", color = "lps", facet.by = "time"
 ggboxplot(data, x = "abx", y = "agglutination", color = "lps")
 # summary stats
 data %>%
-  group_by(time,abx) %>%
+  group_by(time,abx,lps) %>%
   get_summary_stats(agglutination, type = "mean_se")
+
+######################
+results <- data %>%
+  filter(time == c('jan24agg', 'feb8agg'))
+View(results)
+results %>%
+  group_by(time,lps) %>%
+  get_summary_stats(agglutination, type = "median")
+######################
 
 # outliers
 data %>%
@@ -221,7 +230,7 @@ ggboxplot(newdat3, x = "lps", y = "score")
 kruskal.test(score ~ lps, data = newdat3) #  water is 0.0018 and P is 0.077
 
 newdat3 %>%
-  group_by(lps,abx) %>%
+  group_by(lps) %>%
   get_summary_stats(score, type = "mean_se")
 
 

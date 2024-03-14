@@ -27,7 +27,7 @@ data <- gi %>%
 View(data)
 
 # visualization
-ggboxplot(data, x = "abx", y = "totri", color = "time", facet.by = "lps")
+ggboxplot(data, x = "abx", y = "totri", color = "lps", facet.by = "time")
 
 
 # summary stats

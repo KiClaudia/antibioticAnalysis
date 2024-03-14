@@ -11,7 +11,7 @@ library("dplyr")
 library("ggpubr")
 library("ggrepel")
 library("betareg")
-library("glmmTMB")
+library("AICcmodavg")
 str(gi)
 gi$iguanaID <- as.factor(gi$iguanaID)
 gi$tx <- as.factor(gi$tx)
@@ -56,9 +56,14 @@ betatime <- betareg::betareg(data$decimal ~  data$time)
 summary(betatime)
 
 betaabx <- betareg::betareg(data$decimal ~  data$abx)
-summary(betaabx)
+#summary(betaabx)
 
-models <- list(betamodel, betatime, betaabx)
+models <- list(betamodel, betatime, betaabx, intercept)
 
 selection <- aictab(cand.set = models)
 selection
+intercept <- betareg::betareg(data$decimal ~ 1)
+summary(intercept)
+
+library(lmtest)
+lrtest(intercept, betamodel)

@@ -11,8 +11,7 @@ library("dplyr")
 library("ggpubr")
 library("ggrepel")
 library("betareg")
-library("glmmTMB")
-library(AICcmodavg)
+library('AICcmodavg')
 str(gi)
 gi$iguanaID <- as.factor(gi$iguanaID)
 gi$tx <- as.factor(gi$tx)
@@ -59,8 +58,9 @@ mod4 <- betareg::betareg(data$decimal ~ data$lps * data$time)
 mod5 <- betareg::betareg(data$decimal ~ data$lps)
 mod6 <- betareg::betareg(data$decimal ~ data$abx)
 mod7 <- betareg::betareg(data$decimal ~ data$time)
+mod8 <- betareg::betareg(data$decimal ~ 1)
 
-models <- list(mod1, mod2, mod3, mod4, mod5, mod6, mod7)
+models <- list(mod1, mod2, mod3, mod4, mod5, mod6, mod7, mod8)
 
 selection <- aictab(cand.set = models)
 selection
@@ -69,8 +69,11 @@ selection
 summary (mod2)
 summary (mod7)
 
+library(lmtest)
+lrtest(mod8, mod2)
+
 data %>%
-  group_by(time) %>%
+  group_by(abx) %>%
   get_summary_stats(BKA, type = "mean_se")
 
 #-------------4 time points (LPS challenge only)-----------
