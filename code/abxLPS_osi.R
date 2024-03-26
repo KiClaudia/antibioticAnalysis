@@ -61,3 +61,43 @@ get_anova_table(sat)
 
 # ns
 # not to self: tried with all three time points (jan20 24 feb8), tried with two time points (jan20, feb8), NS both times
+###################################################################################
+###################################################################################
+###################################################################################
+# Convert to wide
+data <- gi %>%
+  select(jan24osi, feb8osi, iguanaID, abx, tx, lps) %>%
+  gather(key = "time", value = "OSI", jan24osi, feb8osi) %>%
+  convert_as_factor(iguanaID, time) %>%
+  na.exclude()
+View(data)
+# add new column
+data <- data %>%
+  unite(abxtime, abx, time, sep = "", remove = FALSE)
+View(data)
+
+# visualization
+ggboxplot(data, x = "abxtime", y = "OSI", color = "lps")#, facet.by = "lps")
+
+# outliers
+data %>%
+  group_by(abxtime, lps) %>%
+  identify_outliers(OSI) #42
+data <- data %>%
+  filter(!iguanaID %in% c(42))
+data
+# normality (use shapiro test because sample size is smaller than 50, n = ~24)
+data %>%
+  group_by(abxtime, lps) %>%
+  shapiro_test(OSI) 
+
+ggqqplot(data, "OSI", ggtheme = theme_bw()) +
+  facet_grid(lps + abxtime ~ time, labeller = "label_both")    # normal enough
+
+# ANOVA
+sat = anova_test(
+  data = data, 
+  OSI ~ abxtime * lps,
+  wid = iguanaID
+)
+get_anova_table(sat)

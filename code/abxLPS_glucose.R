@@ -71,3 +71,54 @@ data %>%
 # post hoc --> jan20 lower than jan24 and feb8, feb8 and jan24 same i.e. glucose increased throughout the trial
 
 # not to self: tried with all three time points (jan20 24 feb8), tried with two time points (jan20, feb8), same results for both
+###################################################################################
+###################################################################################
+###################################################################################
+library('emmeans')
+str(gi)
+gi$iguanaID <- as.character(gi$iguanaID)
+gi$tx <- as.factor(gi$tx)
+gi$abx <- as.factor(gi$abx)
+gi$lps <- as.factor(gi$lps)
+str(gi)
+
+# convert to wide
+data <- gi %>%
+  select(jan20glu, jan24glu, feb8glu, iguanaID, abx, tx, lps) %>%
+  gather(key = "time", value = "glucose", jan24glu, feb8glu) %>%
+  convert_as_factor(iguanaID, time) %>%
+  na.exclude()
+View(data)
+
+# add new column
+data <- data %>%
+  unite(abxtime, abx, time, sep = "", remove = FALSE)
+View(data)
+data$iguanaID <- as.numeric(data$iguanaID)
+# visualization
+ggboxplot(data, x = "abxtime", y = "glucose", color = "lps")#, facet.by = "lps")
+
+# outliers
+data %>%
+  group_by(abxtime, lps) %>%
+  identify_outliers(glucose) #----ID# 3, 70
+
+data <- data %>%
+  filter(!iguanaID %in% c("3", '70'))
+
+# normality (use shapiro test because sample size is smaller than 50, n = ~24)
+data %>%
+  group_by(abxtime, lps) %>%
+  shapiro_test(glucose) 
+
+ggqqplot(data, "glucose", ggtheme = theme_bw()) +
+  facet_grid(lps + abxtime ~ time, labeller = "label_both")    # normal enough
+
+# ANOVA
+sat = anova_test(
+  data = data, 
+  glucose ~ abxtime * lps,
+  wid = iguanaID
+)
+get_anova_table(sat)
+summary(sat)

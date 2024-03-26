@@ -92,6 +92,56 @@ data %>%
   aov(totri ~ lps, data=.) %>%
   summary() # When iguanas are given water, there are no effects on totri response to LPS
 
-
-
 # not to self: tried with all three time points (jan20 24 feb8), tried with two time points (jan20, feb8), same results for both
+###########################################################
+###########################################################
+###########################################################
+# convert to wide
+data <- gi %>%
+  select(jan24totri, feb8totri, iguanaID, abx, tx, lps) %>%
+  gather(key = "time", value = "totri", jan24totri, feb8totri) %>%
+  convert_as_factor(iguanaID, time) %>%
+  na.exclude()
+View(data)
+
+# add new column
+data <- data %>%
+  unite(abxtime, abx, time, sep = "", remove = FALSE)
+View(data)
+
+# visualization
+ggboxplot(data, x = "abxtime", y = "totri", color = "lps")#, facet.by = "lps")
+
+ggplot(data=data, aes(x=time, y=totri)) +
+  geom_line()+
+  geom_point()
+# outliers
+data %>%
+  group_by(abxtime, lps) %>%
+  identify_outliers(totri) #57, 64, 65
+data <- data %>%
+  filter(!iguanaID %in% c('57', '64', '65'))
+data
+# normality (use shapiro test because sample size is smaller than 50, n = ~24)
+data %>%
+  group_by(abxtime, lps) %>%
+  shapiro_test(totri) 
+
+ggqqplot(data, "totri", ggtheme = theme_bw()) +
+  facet_grid(lps + abxtime ~ time, labeller = "label_both")    # normal enough
+
+# ANOVA
+sat = anova_test(
+  data = data, 
+  totri ~ abxtime * lps,
+  wid = iguanaID
+)
+get_anova_table(sat)
+model <- lm(totri ~ abxtime*lps, data = data)
+summary(model)
+emmeans(model, list(pairwise ~ abxtime), adjust = "tukey")
+
+data %>%
+  group_by(abxtime) %>%
+  get_summary_stats(totri, type = "mean_se")
+

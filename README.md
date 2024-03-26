@@ -35,3 +35,9 @@ New script for BKA, used beta regression
 We can't look at effect of just antibiotics because there is no Jan20 time point. 
 New script abxLPS_igy, 3 way rm anova looking at effects of anx AND LPS over entire study
 Updated in manuscript too (results)
+
+# 3/18/2024
+Redoing abx*LPS analysis using 2 way anova (abx*lps) with iguana ID as a random effect. time will be incorporated by making a new variable with abx and time. 
+
+# 3/22/2024
+New redo series in code has to do with me redoing analysis using tx_time (combo of lps abx time) as a new 1 way model

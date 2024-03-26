@@ -1,0 +1,95 @@
+---
+title: "abxLPS_bka_redo"
+author: "Claudia Ki"
+date: "3/26/2024"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+# 7/25/2022 
+# Question: Effect of antibiotics and LPS challenge on phys variables - BKA? 
+# Method: beta regression, compare abx * LPS *dates, jan 24, jan 26, feb1, feb 8 + iguanaID random effect
+```{r, results = 'hide'}
+gi <- read.csv("C:/Users/claud/OneDrive - USU/Desktop/Antibiotic study 2022/antibioticAnalysis/data/AbxMasterData_with_OSI.csv")
+View(gi) 
+
+library("rstatix")
+library("tidyverse")
+library("dplyr")
+library("ggpubr")
+library("ggrepel")
+library("betareg")
+library('lmtest')
+library('emmeans')
+str(gi)
+gi$tx <- as.factor(gi$tx)
+gi$abx <- as.factor(gi$abx)
+gi$lps <- as.factor(gi$lps)
+gi$iguanaID <- as.numeric(gi$iguanaID)
+str(gi)
+# convert to wide
+data <- gi %>%
+  select(jan24bka, jan26bka, feb1bka, feb8bka, iguanaID, abx, tx, lps) %>%
+  gather(key = "time", value = "BKA", jan24bka, jan26bka, feb1bka, feb8bka) %>%
+  convert_as_factor(iguanaID, time) %>%
+  na.exclude()
+View(data)
+
+# need to replace over 1 == 1, same for 0
+data$BKA[data$BKA > 100] <- 99.99
+data$BKA[data$BKA < 0] <- 0.01
+
+data2 <- data %>%
+  mutate(decimal = BKA/100) 
+View(data2)
+
+range(data2$decimal) #looks good
+# visualization
+ggboxplot(data2, x = "time", y = "BKA", color = "abx")
+
+# normality
+hist(data2$decimal) #skewed
+
+# add new column
+data3 <- data2 %>%
+  unite(txtime, abx, time, lps, sep = "", remove = FALSE)
+View(data3)
+null <- (data2$decimal~1)
+```
+
+```{r}
+# summary stats
+data2 %>%
+  group_by(abx) %>%
+  get_summary_stats(BKA, type = "mean_se")
+
+data2$iguanaID <- as.numeric(data2$iguanaID)
+data3$iguanaID <- as.numeric(data3$iguanaID)
+```
+
+```{r}
+# 3-way model
+mod1 <- betareg::betareg(data2$decimal ~ data2$abx * data2$lps * data2$time + data2$iguanaID) #note that I am using iguanaID which loses 2 df as opposed to 1|iguanaID which loses 1df because betareg doesn't allow to do mixed effect
+Anova(mod1)
+lrtest(mod1, null)
+emmeans(mod1, list(pairwise ~ abx), adjust = "tukey")
+emmeans(mod1, list(pairwise ~ time), adjust = "tukey")
+```
+
+```{r}
+# tx_time model
+mod2 <- betareg::betareg(decimal ~ txtime + iguanaID, data=data3)
+Anova(mod2)
+```
+
+```{r}
+# compare the two models
+lrtest(mod1, mod2) # exactly the same!
+```
+
+```{r}
+# pairwise
+emmeans(mod2, list(pairwise ~ txtime), adjust = "tukey")
+
+```

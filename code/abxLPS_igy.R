@@ -36,7 +36,7 @@ data <- data %>%
 # visualization
 ggboxplot(data, x = "abx", y = "igy", color = "time", facet.by = "lps")
 ggboxplot(data, x = "lps", y = "igy", color = "time", facet.by = "abx")
-
+ggboxplot(data, x = "time", y = "igy", color = "abx")
 # summary stats
 data %>%
   group_by(time, abx, lps) %>%
@@ -131,6 +131,55 @@ data %>%
 
 data %>%
   group_by(lps,time) %>%
+  get_summary_stats(igy, type = "mean_se")
+
+###########################################################
+###########################################################
+###########################################################
+# convert to wide
+data <- gi %>%
+  select(jan24igy, jan26igy, feb1igy, feb8igy, iguanaID, abx, tx, lps) %>%
+  gather(key = "time", value = "igy", jan24igy, jan26igy, feb1igy, feb8igy) %>%
+  convert_as_factor(iguanaID, time) %>%
+  na.exclude()
+
+# add new column
+data <- data %>%
+  unite(abxtime, abx, time, sep = "", remove = FALSE)
+View(data)
+
+# visualization
+ggboxplot(data, x = "abxtime", y = "igy", color = "lps")#, facet.by = "lps")
+
+# outliers
+data %>%
+  group_by(abxtime, lps) %>%
+  identify_outliers(igy) #15, 29, 56
+data <- data %>%
+  filter(!iguanaID %in% c('15', '29', '56'))
+data
+# normality (use shapiro test because sample size is smaller than 50, n = ~24)
+data %>%
+  group_by(abxtime, lps) %>%
+  shapiro_test(igy) 
+
+ggqqplot(data, "igy", ggtheme = theme_bw()) +
+  facet_grid(lps + abxtime ~ time, labeller = "label_both")    # normal enough
+
+# ANOVA
+sat = anova_test(
+  data = data, 
+  igy ~ abxtime * lps,
+  wid = iguanaID
+)
+get_anova_table(sat)
+
+model <- lm(igy ~ abxtime*lps, data = data)
+summary(model)
+emmeans(model, list(pairwise ~ abxtime), adjust = "tukey")
+
+data %>%
+  group_by(lps) %>%
   get_summary_stats(igy, type = "mean_se")
 
 

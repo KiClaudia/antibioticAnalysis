@@ -190,3 +190,46 @@ ggplot(data, aes(x=factor(time, level=c('jan20bka', 'jan24bka', 'jan26bka', 'feb
                    labels=c("AbxTrtStart", "AbxTrtEnd", "24hrPostLPS", "1weekPostLPS", "2weekPostLPS"))
 
 
+
+###########################################################
+###########################################################
+###########################################################
+# convert to wide
+data <- gi %>%
+  select(jan24bka, jan26bka, feb1bka, feb8bka, iguanaID, abx, tx, lps) %>%
+  gather(key = "time", value = "BKA",jan24bka, jan26bka, feb1bka, feb8bka) %>%
+  convert_as_factor(iguanaID, time) %>%
+  na.exclude()
+View(data)
+
+# add new column
+data <- data %>%
+  unite(abxtime, abx, time, sep = "", remove = FALSE)
+View(data)
+
+# visualization
+ggboxplot(data, x = "abxtime", y = "BKA", color = "lps")#, facet.by = "lps")
+
+# AIC and model
+range(data$decimal)
+
+mod1 <-  betareg::betareg(decimal ~ abxtime*lps, data=data)
+mod2 <- betareg::betareg(decimal ~ abxtime, data = data) 
+mod3 <- betareg::betareg(decimal ~ lps, data=data )
+mod4 <- betareg::betareg(decimal ~ 1, data=data )
+
+models <- list(mod1, mod2, mod3, mod4)
+
+selection <- aictab(cand.set = models)
+selection
+
+# regression
+summary (mod2)
+library(lmtest)
+lrtest(mod4, mod2)
+
+emmeans(mod2, list(pairwise ~ abxtime), adjust = "tukey")
+
+data %>%
+  group_by(lps) %>%
+  get_summary_stats(BKA, type = "mean_se")

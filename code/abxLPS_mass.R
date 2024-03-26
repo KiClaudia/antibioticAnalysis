@@ -54,3 +54,44 @@ sat = anova_test(
 get_anova_table(sat)
 
 # ns
+################################################################################
+################################################################################
+################################################################################
+library('emmeans')
+
+# convert to wide
+data <- gi %>%
+  select(jan20mass, jan24mass, feb8mass, iguanaID, abx, tx, lps) %>%
+  gather(key = "time", value = "mass", jan24mass, feb8mass) %>%
+  convert_as_factor(iguanaID, time) %>%
+  na.exclude()
+View(data)
+
+# add new column
+data <- data %>%
+  unite(abxtime, abx, time, sep = "", remove = FALSE)
+View(data)
+
+# visualization
+ggboxplot(data, x = "abxtime", y = "mass", color = "lps")#, facet.by = "lps")
+
+# outliers
+data %>%
+  group_by(abxtime, lps) %>%
+  identify_outliers(mass) 
+
+# normality (use shapiro test because sample size is smaller than 50, n = ~24)
+data %>%
+  group_by(abxtime, lps) %>%
+  shapiro_test(mass) 
+
+ggqqplot(data, "mass", ggtheme = theme_bw()) +
+  facet_grid(lps + abxtime ~ time, labeller = "label_both")    # normal enough
+
+# ANOVA
+sat = anova_test(
+  data = data, 
+  mass ~ abxtime * lps,
+  wid = iguanaID
+)
+get_anova_table(sat)
