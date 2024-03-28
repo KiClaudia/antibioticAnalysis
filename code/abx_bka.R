@@ -49,21 +49,15 @@ data <- data %>%
 range(data$decimal) # range is good
 
 # beta regression
-betamodel <- betareg::betareg(data$decimal ~ data$abx * data$time)
-summary(betamodel)
+library("glmmTMB")
+glmm <- glmmTMB(decimal ~ abx* time + (1|iguanaID), 
+                data = data, (family = beta_family(link = "logit")))
 
-betatime <- betareg::betareg(data$decimal ~  data$time)
-summary(betatime)
+Anova(glmm)
 
-betaabx <- betareg::betareg(data$decimal ~  data$abx)
-#summary(betaabx)
-
-models <- list(betamodel, betatime, betaabx, intercept)
-
-selection <- aictab(cand.set = models)
-selection
-intercept <- betareg::betareg(data$decimal ~ 1)
-summary(intercept)
-
+null <- glmmTMB(decimal ~ 1, 
+                data = data, (family = beta_family(link = "logit")))
 library(lmtest)
-lrtest(intercept, betamodel)
+lrtest(glmm, null)
+
+#### not doing txtime model because if it wasn't significant in the 2-way model, it won't be in the txtime model since it is suppose to be the same

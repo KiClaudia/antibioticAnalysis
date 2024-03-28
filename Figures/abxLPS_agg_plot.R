@@ -2,8 +2,8 @@
 
 gi <- read.csv("C:/Users/claud/OneDrive - USU/Desktop/Antibiotic study 2022/antibioticAnalysis/data/AbxMasterData_igy.csv")
 df <- gi %>%
-  select(jan24agg, jan26agg, feb8agg, iguanaID, abx, tx, lps) %>%
-  gather(key = "time", value = "BKA",jan24agg, jan26agg, feb8agg) %>%
+  select(jan24agg, jan26agg, feb1agg, feb8agg, iguanaID, abx, tx, lps) %>%
+  gather(key = "time", value = "BKA",jan24agg, jan26agg, feb1agg, feb8agg) %>%
   convert_as_factor(iguanaID, time) %>%
   na.exclude()
 View(df)
@@ -34,12 +34,12 @@ head(df2)
 
 # plot
 
-ggplot(data = df2, aes(x = factor(time, level=c('jan24agg', 'jan26agg', 'feb8agg')), y = mean, group = Treatments)) +
+ggplot(data = df2, aes(x = factor(time, level=c('jan24agg', 'jan26agg', 'feb1agg','feb8agg')), y = mean, group = Treatments)) +
   geom_point(aes(color = Treatments), size = 3)+
   geom_line(aes(linetype = Treatments, color = Treatments), size = 1.25) +
   scale_linetype_manual(values=c("dotdash", "solid","dotdash", "solid","dotdash", "solid")) +
   scale_y_continuous(limits = c(0,6), name = "Agglutination Score") +
-  scale_x_discrete(breaks=c('jan24agg', 'jan26agg', 'feb8agg'), 
+  scale_x_discrete(breaks=c('jan24agg', 'jan26agg','feb1agg', 'feb8agg'), 
                    name = 'Antibiotics LPS Timeline') +
   geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width = 0.05) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),

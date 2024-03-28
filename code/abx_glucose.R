@@ -12,7 +12,6 @@ library("ggpubr")
 library("ggrepel")
 
 str(gi)
-gi$iguanaID <- as.factor(gi$iguanaID)
 gi$tx <- as.factor(gi$tx)
 gi$abx <- as.factor(gi$abx)
 gi$lps <- as.factor(gi$lps)
@@ -46,14 +45,23 @@ data %>%
   shapiro_test(glu) # normal
 
 # ANOVA
-sat = anova_test(
-  data = data, 
-  glu ~ abx  *time,
-  wid = iguanaID
-)
-get_anova_table(sat)
-
+data$iguanaID <- as.numeric(data$iguanaID)
+model <- lm(data = data, glu ~ abx * time + (1|iguanaID))
+Anova(model)
+summary(model)
 # effect of time, higher glucose after antibiotic txt
 data %>%
   group_by(time) %>%
   get_summary_stats(glu, type = "mean_se")
+
+###### txtime model ##########
+data <- data %>%
+  unite(abxtime, abx, time, sep = "", remove = FALSE)
+head(data)
+
+data$iguanaID <- as.numeric(data$iguanaID)
+model2 <- lm(data = data, glu ~ abxtime + (1|iguanaID))
+Anova(model2)
+
+library(emmeans)
+emmeans(model2, list(pairwise ~ abxtime), adjust = "tukey", data = data) # water group was higher after

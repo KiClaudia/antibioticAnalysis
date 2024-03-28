@@ -17,7 +17,6 @@ str(gi)
 gi$tx <- as.factor(gi$tx)
 gi$abx <- as.factor(gi$abx)
 gi$lps <- as.factor(gi$lps)
-gi$iguanaID <- as.numeric(gi$iguanaID)
 str(gi)
 # convert to wide
 data <- gi %>%
@@ -45,9 +44,6 @@ data2 %>%
   group_by(abx) %>%
   get_summary_stats(BKA, type = "mean_se")
 
-data2$iguanaID <- as.numeric(data2$iguanaID)
-data3$iguanaID <- as.numeric(data3$iguanaID)
-
 # normality
 hist(data2$decimal) #skewed
 
@@ -58,18 +54,24 @@ View(data3)
 null <- (data2$decimal~1)
 
 # 3-way model
-mod1 <- betareg::betareg(data2$decimal ~ data2$abx * data2$lps * data2$time + data2$iguanaID) #note that I am using iguanaID which loses 2 df as opposed to 1|iguanaID which loses 1df because betareg doesn't allow to do mixed effect
-Anova(mod1)
-lrtest(mod1, null)
+library("glmmTMB")
+glmm <- glmmTMB(decimal ~ abx* lps * time + (1|iguanaID), 
+                data = data2, (family = beta_family(link = "logit")))
+summary(glmm)
+Anova(glmm)
+
+lrtest(glmm, null)
 
 # tx_time model
-mod2 <- betareg::betareg(decimal ~ txtime + iguanaID, data=data3)
-Anova(mod2)
+glmm2 <- glmmTMB(decimal ~ txtime + (1|iguanaID), 
+                data = data3, (family = beta_family(link = "logit")))
+
+Anova(glmm2)
 
 # compare the two models
-lrtest(mod1, mod2) # exactly the same!
+lrtest(glmm, glmm2) # exactly the same!
 
 # pairwise
-emmeans(mod2, list(pairwise ~ txtime), adjust = "tukey")
-emmeans(mod1, list(pairwise ~ abx), adjust = "tukey")
-emmeans(mod1, list(pairwise ~ time), adjust = "tukey")
+emmeans(glmm2, list(pairwise ~ txtime), adjust = "tukey")
+emmeans(glmm, list(pairwise ~ abx), adjust = "tukey")
+emmeans(glmm, list(pairwise ~ time), adjust = "tukey")

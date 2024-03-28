@@ -56,11 +56,9 @@ data  <- data %>%
 View(data)
 
 # ANOVA
-sat = anova_test(
-  data = data, 
-  totrilogged ~ abx  *time,
-  wid = iguanaID
-)
-get_anova_table(sat)
+data$iguanaID <- as.numeric(data$iguanaID)
+model <- lm(data = data, totrilogged ~ abx * time + (1|iguanaID))
+Anova(model)
 
-# not significant
+
+# not significant so not doing txtime model because it will also not be significant

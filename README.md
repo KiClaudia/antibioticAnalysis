@@ -41,3 +41,6 @@ Redoing abx*LPS analysis using 2 way anova (abx*lps) with iguana ID as a random 
 
 # 3/22/2024
 New redo series in code has to do with me redoing analysis using tx_time (combo of lps abx time) as a new 1 way model
+
+# 3/27/2024
+New redo series also contain my origianl 3-way model (I redid it with lm code as opposed to anova but that should give the exact same results)

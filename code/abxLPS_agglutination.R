@@ -108,6 +108,10 @@ kruskal.test(score ~ lps, data = data4) # p=0.0728
 kruskal.test(score ~ abx, data = data4) # ns
 kruskal.test(score ~ tx, data = data4) # p=0.0184
 pairwise.wilcox.test(data4$score, data4$tx)
+data4 %>%
+  group_by(tx) %>%
+  get_summary_stats(score, type = "mean_se")
+
 
 #------- 1week - 24hr -------
 data5 <- gi %>%

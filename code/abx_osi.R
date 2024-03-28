@@ -55,11 +55,9 @@ ggqqplot(data, "OSI", ggtheme = theme_bw()) +
 hist(sqrt(data$OSI)) 
 
 # ANOVA
-sat = anova_test(
-  data = data, 
-  OSI ~ abx  *time,
-  wid = iguanaID
-)
-get_anova_table(sat)
 
-# not significant
+data$iguanaID <- as.numeric(data$iguanaID)
+model <- lm(data = data, OSI ~ abx * time + (1|iguanaID))
+Anova(model)
+
+# not significant, not doing txtime model because it will also not be significant

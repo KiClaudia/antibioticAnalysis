@@ -11,7 +11,6 @@ library("ggpubr")
 library("ggrepel")
 
 str(gi)
-gi$iguanaID <- as.factor(gi$iguanaID)
 gi$tx <- as.factor(gi$tx)
 gi$abx <- as.factor(gi$abx)
 gi$lps <- as.factor(gi$lps)
@@ -26,30 +25,28 @@ data <- gi %>%
 View(data)
 
 # add new column
+
 data <- data %>%
-  unite(abxtime, abx, time, sep = "", remove = FALSE)
-View(data)
-data <- data %>%
-  unite(all, abx, time, lps, sep = "", remove = FALSE)
+  unite(txtime, abx, time, lps, sep = "", remove = FALSE)
 View(data)
 
 # visualization
-ggboxplot(data, x = "all", y = "lysis")
+ggboxplot(data, x = "txtime", y = "lysis")
 
 # summary stats
 data %>%
   group_by(time) %>%
   get_summary_stats(agg, type = "median")
-
-levels(data$abxtime)
+str(data)
+data$txtime <- as.factor(data$txtime)
+levels(data$txtime)
 
 # kruskal wallis is needed (transformation doesn't work, no other distribution matches this)
-kruskal.test(lysis ~ lps, data = data)
-kruskal.test(lysis ~ abx, data = data)
-kruskal.test(lysis ~ time, data = data)
-kruskal.test(lysis ~ abxtime, data =data)
-kruskal.test(lysis ~ all, data =data)
-pairwise.wilcox.test(data$lysis, data$all,
+kruskal.test(lysis ~ lps, data = data) #ns
+kruskal.test(lysis ~ abx, data = data) #ns
+kruskal.test(lysis ~ time, data = data) #ns
+kruskal.test(lysis ~ txtime, data =data) #sig but pairwise did not show anything was actually significant
+pairwise.wilcox.test(data$lysis, data$txtime,
                      p.adjust.method = "BH")
 
 

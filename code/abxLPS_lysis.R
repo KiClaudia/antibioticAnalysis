@@ -12,7 +12,6 @@ library("ggpubr")
 library("ggrepel")
 
 str(gi)
-gi$iguanaID <- as.factor(gi$iguanaID)
 gi$tx <- as.factor(gi$tx)
 gi$abx <- as.factor(gi$abx)
 gi$lps <- as.factor(gi$lps)
@@ -82,7 +81,7 @@ kruskal.test(score ~ lps, data = data3) # ns
 kruskal.test(score ~ abx, data = data3) # ns
 kruskal.test(score ~ tx, data = data3) # ns
 
-#------- 2week - Baseline -------
+#------- 2week - Baseline -------#this is whats in the paper
 data4 <- gi %>%
   mutate(score = feb8lys - jan24lys) %>%
   select(score, iguanaID, abx, tx, lps, feb8lys, jan24lys) %>%

@@ -46,11 +46,8 @@ data %>%
   shapiro_test(mass) #--------normal
 
 # ANOVA
-sat = anova_test(
-  data = data, 
-  mass ~ abx  *time,
-  wid = iguanaID
-)
-get_anova_table(sat)
+data$iguanaID <- as.numeric(data$iguanaID)
+model <- lm(data = data, mass ~ abx * time + (1|iguanaID))
+Anova(model)
 
-# not significant
+# not significant so not doing txtime model because it will also not be significant
