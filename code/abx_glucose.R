@@ -17,7 +17,7 @@ gi$abx <- as.factor(gi$abx)
 gi$lps <- as.factor(gi$lps)
 str(gi)
 
-# convert to wide
+# convert to long
 data <- gi %>%
   select(jan20glu, jan24glu, iguanaID, abx, tx, lps) %>%
   gather(key = "time", value = "glu", jan20glu, jan24glu) %>%
@@ -49,6 +49,7 @@ data$iguanaID <- as.numeric(data$iguanaID)
 model <- lm(data = data, glu ~ abx * time + (1|iguanaID))
 Anova(model)
 summary(model)
+
 # effect of time, higher glucose after antibiotic txt
 data %>%
   group_by(time) %>%

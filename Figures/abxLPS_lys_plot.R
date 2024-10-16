@@ -23,26 +23,41 @@ levels(df2$Treatments) <- list("Clindamycin-LPS" = "cl",
                                "Water-PBS" = "wp")
 head(df2)
 # make new column that will describe the position in time of our points (slightly off to make it easier to read labels)
-#df2 <- df2 %>% 
- # mutate(timenum = str_replace(time, "jan24totri", "0")) %>%
- # mutate(timenum = str_replace(timenum, "feb8totri", "7"))
+df2 <- df2 %>% 
+  mutate(timenum = str_replace(time, "jan24lys", "0")) %>%
+  mutate(timenum = str_replace(timenum, "jan26lys", "2")) %>%
+  mutate(timenum = str_replace(timenum, "feb1lys", "8")) %>%
+  mutate(timenum = str_replace(timenum, "feb8lys", "13"))
 
 # tell R that it is a number so it can work on a continuous scale
-#View(df2)
-#str(df2)
-#df2$timenum <- as.numeric(df2$timenum)
+View(df2)
+str(df2)
+df2$timenum <- as.numeric(df2$timenum)
 
 # plot
 
-ggplot(data = df2, aes(x = factor(time, level=c('jan24lys', 'jan26lys', 'feb1lys','feb8lys')), y = mean, group = Treatments)) +
-  geom_point(aes(color = Treatments), size = 3)+
-  geom_line(aes(linetype = Treatments, color = Treatments), size = 1.25) +
+df2 <- df2 %>%
+  mutate(positionName = str_replace(time, "jan24lys", "Post-Antibiotics")) %>%
+  mutate(positionName = str_replace(positionName, "jan26lys", "24hr Post-injection")) %>%
+  mutate(positionName = str_replace(positionName, "feb1lys", "1week Post-injection")) %>%
+  mutate(positionName = str_replace(positionName, "feb8lys", "2week Post-injection"))  
+
+
+# plot
+
+
+ggplot(data = df2, aes(x = timenum, y = mean, group = Treatments)) +
+  geom_point(aes(color = Treatments), size = 2) +
+  geom_line(aes(linetype = Treatments, color = Treatments), size = 1) +
   scale_linetype_manual(values=c("dotdash", "solid","dotdash", "solid","dotdash", "solid")) +
   scale_y_continuous(limits = c(0,6), name = "Lysis Score") +
-  scale_x_discrete(breaks=c('jan24lys', 'jan26lys', 'feb1lys','feb8lys'), 
-                   name = 'Antibiotics LPS Timeline') +
+  scale_x_continuous(breaks = df2$timenum,labels = df2$positionName, limits = c(0,14), 
+                     name = "Timeline")+
   geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width = 0.05) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        axis.text.x = element_text(angle = 30, hjust = 1, vjust = 1)) +
-  scale_color_manual(values=c("#CC0000", "#CC0000", "#CC9900", "#CC9900","#33CCFF","#33CCFF"))
+        axis.text.x = element_text(angle = 30,size = 8, hjust = 1, vjust = 1)) +
+  scale_color_manual(values=c("#CC0000", "#CC0000", "#CC9900", "#CC9900","#33CCFF","#33CCFF"))+
+  annotate("text", x = c(3), y=4, colour= "purple", label = c("LPS\nChallenge"))+
+  geom_vline(xintercept = 1, col = "purple", size = 0.75) 
+
